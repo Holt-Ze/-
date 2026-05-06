@@ -1,0 +1,15 @@
+{
+  "appId": "com.kaoyan.dailytracker",
+  "appName": "考研每日追踪",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "StatusBar": {
+      "overlaysWebView": true,
+      "style": "DARK",
+      "backgroundColor": "#00000000"
+    }
+  }
+}

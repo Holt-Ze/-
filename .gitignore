@@ -1,0 +1,24 @@
+node_modules/
+
+# Android build artifacts
+android/.gradle/
+android/app/build/
+android/local.properties
+android/captures/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+*.apk
+*.aab
+*.keystore
+
+# Claude
+.claude/

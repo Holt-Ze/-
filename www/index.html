@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#312e81">
+  <title>考研每日追踪</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ════ Tab 1: 今日 ════ -->
+  <main class="tab-page active" id="tab-today">
+    <div class="page">
+      <section class="date-strip">
+        <div>
+          <span class="pill" id="dayPill">周三</span>
+          <div class="date-strip-title" id="dateText">2026-05-06 周三</div>
+        </div>
+        <label class="date-picker">
+          <span>日期</span>
+          <input id="date" type="date" aria-label="日期">
+        </label>
+      </section>
+
+      <!-- Progress -->
+      <div class="panel" style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font-weight:800;font-size:16px">今日完成度</span>
+          <span style="font-weight:850;font-size:24px;color:var(--accent)" id="todayPercent">0%</span>
+        </div>
+        <div class="progress-shell">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="autosave-status" id="autosaveStatus">自动保存已开启</div>
+      </div>
+
+      <!-- Subjects -->
+      <section class="panel">
+        <h2 class="section-title">📋 今日专项</h2>
+        <div class="task-grid" id="taskGrid"></div>
+      </section>
+
+      <!-- Review -->
+      <section class="panel">
+        <h2 class="section-title">📝 今日复盘</h2>
+        <textarea id="review" placeholder="今天为什么分心？哪道题卡住了？明天怎么改？"></textarea>
+        <div class="actions">
+          <button class="btn" id="resetBtn" type="button">重置当天</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ════ Tab 2: 计时 ════ -->
+  <main class="tab-page" id="tab-timer">
+    <div class="page">
+      <div id="timerContent"></div>
+    </div>
+  </main>
+
+  <!-- ════ Tab 3: 统计 ════ -->
+  <main class="tab-page" id="tab-stats">
+    <div class="page">
+      <div id="statsContent"></div>
+    </div>
+  </main>
+
+  <!-- ════ Tab 4: 设置 ════ -->
+  <main class="tab-page" id="tab-settings">
+    <div class="page">
+      <div id="settingsContent"></div>
+    </div>
+  </main>
+
+  <!-- ════ Tab Bar ════ -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="today" onclick="switchTab('today')">
+      <span class="tab-icon">📋</span>今日
+    </button>
+    <button class="tab-btn" data-tab="timer" onclick="switchTab('timer')">
+      <span class="tab-icon">⏱️</span>计时
+    </button>
+    <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">
+      <span class="tab-icon">📊</span>统计
+    </button>
+    <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">
+      <span class="tab-icon">⚙️</span>设置
+    </button>
+  </nav>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

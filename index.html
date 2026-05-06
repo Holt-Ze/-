@@ -1,0 +1,1712 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kaoyan Daily Tracker</title>
+  <style>
+    :root {
+      --bg: #f8f7f4;
+      --card: #ffffff;
+      --ink: #18181b;
+      --muted: #71717a;
+      --soft: #f4f4f5;
+      --line: #e4e4e7;
+      --accent: #4f46e5;
+      --accent-2: #4338ca;
+      --accent-light: #eef2ff;
+      --accent-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
+      --hero-gradient: linear-gradient(135deg, #312e81 0%, #4f46e5 40%, #7c3aed 100%);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+      --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,.06), 0 2px 4px -2px rgba(0,0,0,.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.07), 0 4px 6px -4px rgba(0,0,0,.04);
+      --shadow-xl: 0 20px 25px -5px rgba(0,0,0,.08), 0 8px 10px -6px rgba(0,0,0,.04);
+      --radius-sm: 12px;
+      --radius: 18px;
+      --radius-lg: 24px;
+      --radius-xl: 28px;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      background-image: radial-gradient(circle, #e5e0f0 1px, transparent 1px);
+      background-size: 32px 32px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, textarea { font: inherit; color: inherit; }
+
+    .page {
+      max-width: 1376px;
+      margin: 32px auto 80px;
+      padding: 0 24px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 28px 36px;
+      color: #fff;
+      background: var(--hero-gradient);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .hero-content { min-width: 200px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(8px);
+      color: #e0e7ff;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .02em;
+    }
+
+    .hero h1 {
+      margin: 10px 0 6px;
+      font-size: clamp(26px, 3vw, 34px);
+      font-weight: 850;
+      letter-spacing: -.01em;
+      line-height: 1.15;
+    }
+
+    .hero .sub {
+      margin: 0;
+      color: #c7d2fe;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .hero-date {
+      display: grid;
+      gap: 6px;
+      justify-items: end;
+      min-width: 180px;
+    }
+
+    .hero-date input[type="date"] {
+      width: 178px;
+      height: 50px;
+      padding: 0 14px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      outline: none;
+      backdrop-filter: blur(6px);
+      transition: border-color .2s, background .2s;
+    }
+
+    .hero-date input[type="date"]:focus {
+      border-color: rgba(255,255,255,.5);
+      background: rgba(255,255,255,.18);
+    }
+
+    .hero-date input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+    }
+
+    .hero-date-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #c7d2fe;
+    }
+
+    /* ── Stats ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 14px;
+      margin: 28px 0;
+    }
+
+    .stat {
+      position: relative;
+      padding: 20px 22px 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      cursor: default;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .stat:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat:hover::before { opacity: 1; }
+
+    .stat-icon { font-size: 22px; margin-bottom: 4px; }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      margin-top: 4px;
+      font-size: 32px;
+      font-weight: 850;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.01em;
+    }
+
+    .stat-note {
+      margin-top: 4px;
+      color: #a1a1aa;
+      font-size: 13px;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(340px, .9fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .stack { display: grid; gap: 22px; }
+
+    /* ── Panel ── */
+    .panel {
+      padding: 24px 26px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 0;
+      font-size: 22px;
+      font-weight: 850;
+      letter-spacing: -.01em;
+    }
+
+    .panel-title .icon-btn {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .panel-title .icon-btn:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+
+    .progress-shell {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e4e4e7;
+    }
+
+    .progress-fill {
+      width: var(--progress, 0%);
+      height: 100%;
+      border-radius: 999px;
+      background: var(--accent-gradient);
+      transition: width .3s ease;
+    }
+
+    /* ── Task cards ── */
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .task-card {
+      display: grid;
+      gap: 12px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fafafa;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .task-card:hover {
+      border-color: #d4d4d8;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .task-card.wide { grid-column: 1 / -1; }
+
+    .task-heading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 19px;
+      font-weight: 850;
+    }
+
+    .label {
+      color: #27272a;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field input {
+      height: 48px;
+      padding: 0 14px;
+      font-size: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+    }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    /* ── Checkbox row ── */
+    .checkbox-row {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 12px;
+      align-items: center;
+      min-height: 72px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      user-select: none;
+      transition: all .2s;
+      background: #fff;
+    }
+
+    .checkbox-row:hover {
+      border-color: #c7d2fe;
+    }
+
+    .checkbox-row input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .fake-check {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border: 1.5px solid #d4d4d8;
+      border-radius: 999px;
+      color: transparent;
+      font-weight: 900;
+      font-size: 13px;
+      transition: all .2s;
+    }
+
+    .checkbox-row:has(input:checked) {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .checkbox-row:has(input:checked) .fake-check {
+      color: var(--accent);
+      background: #fff;
+      border-color: #fff;
+      transform: scale(1.1);
+    }
+
+    .checkbox-row:has(input:checked) .hint { color: #c7d2fe; }
+
+    .hint {
+      color: #a1a1aa;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .checkbox-row strong { font-size: 15px; }
+
+    /* ── Routine ── */
+    .routine-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .routine-grid .field input { height: 46px; font-size: 16px; }
+
+    .routine-grid .checkbox-row {
+      grid-column: span 3;
+      align-self: end;
+      min-height: 74px;
+    }
+
+    /* ── Textarea ── */
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+      padding: 16px;
+      font-size: 18px;
+      line-height: 1.6;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+    }
+
+    /* ── Buttons ── */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      min-height: 46px;
+      padding: 0 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .btn:hover {
+      background: #f4f4f5;
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(79,70,229,.3);
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-2);
+      box-shadow: 0 6px 16px rgba(79,70,229,.4);
+      transform: translateY(-1px);
+    }
+
+    .btn.primary:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(79,70,229,.3);
+    }
+
+    .btn.danger {
+      color: #ef4444;
+      border-color: #fecaca;
+    }
+
+    .btn.danger:hover {
+      background: #fef2f2;
+      border-color: #ef4444;
+    }
+
+    /* ── Side panels ── */
+    .side-panel {
+      padding: 22px 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .side-panel h2 {
+      margin: 0 0 18px;
+      font-size: 19px;
+      font-weight: 850;
+    }
+
+    .record-list { display: grid; gap: 10px; }
+
+    .record {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fafafa;
+      transition: border-color .15s;
+    }
+
+    .record:hover { border-color: #d4d4d8; }
+
+    .record-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .mini-progress {
+      height: 8px;
+      margin: 10px 0 8px;
+      border-radius: 999px;
+      background: #e4e4e7;
+      overflow: hidden;
+    }
+
+    .mini-progress span {
+      display: block;
+      width: var(--mini, 0%);
+      height: 100%;
+      border-radius: 999px;
+      background: var(--accent-gradient);
+    }
+
+    .tips {
+      display: grid;
+      gap: 10px;
+    }
+
+    .tip {
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      background: #f5f5f5;
+      color: #52525b;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .tip b { color: var(--ink); }
+
+    .rule-card {
+      padding: 24px;
+      color: #fff;
+      background: var(--hero-gradient);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .rule-card h2 {
+      margin: 0 0 12px;
+      font-size: 21px;
+      font-weight: 850;
+    }
+
+    .rule-card p {
+      margin: 0;
+      line-height: 1.75;
+      font-weight: 600;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 100;
+      padding: 14px 20px;
+      color: #fff;
+      background: #18181b;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0,0,0,.4);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 560px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 28px;
+      background: #fff;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      transform: translateY(12px);
+      transition: transform .2s;
+    }
+
+    .modal-overlay.open .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-card h2 {
+      margin: 0 0 20px;
+      font-size: 22px;
+      font-weight: 850;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-card h3 {
+      margin: 22px 0 12px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all .15s;
+      z-index: 1;
+    }
+
+    .modal-close:hover {
+      background: #f4f4f5;
+      border-color: #d4d4d8;
+    }
+
+    .task-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      transition: border-color .15s;
+    }
+
+    .task-list-item:hover { border-color: #d4d4d8; }
+
+    .task-list-item .task-name {
+      flex: 1;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .task-list-item .task-meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .task-list-item .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .task-list-item button {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .task-list-item button:hover {
+      background: #f4f4f5;
+      border-color: #d4d4d8;
+    }
+
+    .task-list-item button.del:hover {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #ef4444;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toggle-track {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: #d4d4d8;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s;
+    }
+
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--accent);
+    }
+
+    .toggle-switch input:checked + .toggle-track::after {
+      transform: translateX(20px);
+    }
+
+    .form-section {
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .form-grid .full { grid-column: 1 / -1; }
+
+    .form-grid label {
+      display: grid;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #52525b;
+    }
+
+    .form-grid label input,
+    .form-grid label select {
+      height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .form-grid label input:focus {
+      border-color: var(--accent);
+    }
+
+    .emoji-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .emoji-picker button {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .emoji-picker button:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .emoji-picker button.selected {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      box-shadow: 0 0 0 2px rgba(79,70,229,.25);
+    }
+
+    .empty-hint {
+      text-align: center;
+      padding: 28px;
+      color: #a1a1aa;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1050px) {
+      .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .layout { grid-template-columns: 1fr; }
+      .routine-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .routine-grid .checkbox-row { grid-column: span 2; }
+    }
+
+    @media (max-width: 720px) {
+      .page { margin-top: 16px; padding: 0 12px; }
+      .hero {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 20px 22px;
+      }
+      .hero-date { justify-items: stretch; }
+      .hero-date input[type="date"] { width: 100%; }
+      .hero h1 { font-size: 24px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .task-grid,
+      .two-cols,
+      .routine-grid { grid-template-columns: 1fr; }
+      .routine-grid .checkbox-row { grid-column: span 1; }
+      .panel, .side-panel { padding: 18px; }
+      .modal-card { padding: 20px; margin: 12px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .stats { grid-template-columns: 1fr; }
+      .stat-value { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-content">
+        <span class="pill" id="dayPill">周三</span>
+        <h1>考研每日追踪</h1>
+        <p class="sub">稳住节奏，每天收口</p>
+      </div>
+      <div class="hero-date">
+        <input id="date" type="date" aria-label="日期">
+        <div class="hero-date-text" id="dateText">2026-05-06 周三</div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats" aria-label="统计">
+      <article class="stat">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">今日完成度</div>
+        <div class="stat-value" id="todayPercent">0%</div>
+        <div class="stat-note">按核心任务加权</div>
+      </article>
+      <article class="stat">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">记录天数</div>
+        <div class="stat-value" id="recordDays">0</div>
+        <div class="stat-note">累计打卡</div>
+      </article>
+      <article class="stat">
+        <div class="stat-icon">📈</div>
+        <div class="stat-label">平均完成度</div>
+        <div class="stat-value" id="averagePercent">0%</div>
+        <div class="stat-note">全部记录平均</div>
+      </article>
+      <article class="stat">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-label">平均学习时长</div>
+        <div class="stat-value" id="averageHours">0.0h</div>
+        <div class="stat-note">有效学习时长</div>
+      </article>
+      <article class="stat">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-label">控手机达标</div>
+        <div class="stat-value" id="phoneWins">0</div>
+        <div class="stat-note">上午不刷 + ≥7分</div>
+      </article>
+    </section>
+
+    <div class="layout">
+      <div class="stack">
+        <!-- Tasks -->
+        <section class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              今日任务
+              <button class="icon-btn" id="manageTasksBtn" title="管理任务">⚙️</button>
+            </h2>
+            <div class="progress-shell" aria-hidden="true">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+          <div class="task-grid" id="taskGrid"></div>
+        </section>
+
+        <!-- Routine -->
+        <section class="panel">
+          <h2 class="panel-title" style="margin-bottom:18px">作息和专注</h2>
+          <div class="routine-grid">
+            <label class="field">
+              <span class="label">起床时间</span>
+              <input id="wakeTime" type="time" value="07:30">
+            </label>
+            <label class="field">
+              <span class="label">上床时间</span>
+              <input id="bedTime" type="time" value="23:30">
+            </label>
+            <label class="field">
+              <span class="label">有效学习时长</span>
+              <input id="studyHours" type="number" min="0" max="18" step="0.5" value="6">
+            </label>
+            <label class="field">
+              <span class="label">专注程度 1-10</span>
+              <input id="focusScore" type="number" min="1" max="10" value="7">
+            </label>
+            <label class="field">
+              <span class="label">手机控制 1-10</span>
+              <input id="phoneScore" type="number" min="1" max="10" value="7">
+            </label>
+            <label class="checkbox-row">
+              <input id="noMorningVideo" type="checkbox">
+              <span class="fake-check">✓</span>
+              <span>
+                <strong>上午不刷短视频</strong><br>
+                <span class="hint">不是一天都不能玩，而是别让短视频截胡早上的启动</span>
+              </span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Review -->
+        <section class="panel">
+          <h2 class="panel-title" style="margin-bottom:14px">今日复盘</h2>
+          <textarea id="review" placeholder="今天为什么分心？哪道题卡住了？明天怎么改？"></textarea>
+          <div class="actions">
+            <button class="btn primary" id="saveBtn" type="button">保存今天</button>
+            <button class="btn" id="resetBtn" type="button">重置当天</button>
+            <button class="btn" id="exportBtn" type="button">导出数据</button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="stack">
+        <section class="side-panel">
+          <h2>最近 7 次记录</h2>
+          <div class="record-list" id="recordList"></div>
+        </section>
+
+        <section class="side-panel">
+          <h2>最低配学习日</h2>
+          <div class="tips">
+            <div class="tip"><b>数学：</b>错题 5 道，必须动笔。</div>
+            <div class="tip"><b>英语：</b>旧词清零，新词可以降到 50。</div>
+            <div class="tip"><b>专业课：</b>半小节错题或 5-10 道题。</div>
+            <div class="tip"><b>复盘：</b>睡前写明天三件事。</div>
+          </div>
+        </section>
+
+        <section class="rule-card">
+          <h2>今天的判断标准</h2>
+          <p>不是看你有没有完美执行，而是看你有没有完成三个主线：数学错题、英语单词、专业课错题。状态差也要保住最低配，不要因为起晚就整天摆烂。</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Task Manager Modal -->
+  <div class="modal-overlay" id="taskModal">
+    <div class="modal-card">
+      <button class="modal-close" id="modalCloseBtn">✕</button>
+      <h2>⚙️ 管理任务</h2>
+      <div id="taskListContainer"></div>
+      <div id="taskFormContainer"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORE_KEY = "kaoyan-daily-tracker-v2";
+    const OLD_STORE_KEY = "kaoyan-daily-tracker-v1";
+    const CONFIG_KEY = "kaoyan-task-config-v1";
+
+    const ROUTINE_FIELDS = ["wakeTime","bedTime","studyHours","focusScore","phoneScore","noMorningVideo","review"];
+
+    const DEFAULT_TASKS = [
+      {
+        id: "math", name: "数学", icon: "📐", target: 5, unit: "道",
+        textFields: [],
+        checkboxes: [
+          { label: "写出 1-2 个最容易再错的点", hint: "不是只看答案，要能说出错因" }
+        ],
+        weight: 30, enabled: true, locked: true, wide: false
+      },
+      {
+        id: "english", name: "英语", icon: "📖", target: 100, unit: "个",
+        textFields: [],
+        checkboxes: [
+          { label: "旧词清零", hint: "旧词优先级高于新词" }
+        ],
+        weight: 30, enabled: true, locked: true, wide: false
+      },
+      {
+        id: "major", name: "专业课", icon: "💻", target: 0, unit: "",
+        textFields: [
+          { id: "subject", label: "科目", placeholder: "数据结构 / 计组", defaultVal: "数据结构 / 计组" },
+          { id: "chapter", label: "小章节", placeholder: "例如：树、图、Cache、中断", defaultVal: "" }
+        ],
+        checkboxes: [
+          { label: "完成一小章节错题", hint: "范围小一点，保证能收口" },
+          { label: "写 3 个核心考点 / 易错点", hint: "睡前 5 分钟也可以补" }
+        ],
+        weight: 30, enabled: true, locked: true, wide: true
+      }
+    ];
+
+    const EMOJI_LIST = ["📐","📊","📚","📝","🔬","💻","📖","🗂️","📋","🎯","💡","🔥","⭐","📌","📏","🔢","🧮","🗣️","🌐","🧪","📡","🏃","🎵","🧘","📈","💪","🧠","🏆"];
+
+    // ── Utils ──
+    const $ = id => document.getElementById(id);
+    const pad = n => String(n).padStart(2, "0");
+    const todayIso = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+    const weekNames = ["周日","周一","周二","周三","周四","周五","周六"];
+
+    function getFieldValue(id) {
+      const el = $(id);
+      if (!el) return undefined;
+      return el.type === "checkbox" ? el.checked : el.value;
+    }
+
+    function setFieldValue(id, value) {
+      const el = $(id);
+      if (!el) return;
+      if (el.type === "checkbox") el.checked = Boolean(value);
+      else if (value !== undefined && value !== null) el.value = value;
+    }
+
+    // ── Task config ──
+    function readTaskConfig() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(CONFIG_KEY));
+        if (saved && saved.length) return saved;
+      } catch {}
+      const defaults = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+      writeTaskConfig(defaults);
+      return defaults;
+    }
+
+    function writeTaskConfig(config) {
+      localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    }
+
+    function getEnabledTasks() {
+      return readTaskConfig().filter(t => t.enabled);
+    }
+
+    // ── Data store ──
+    function migrateData() {
+      try {
+        const old = localStorage.getItem(OLD_STORE_KEY);
+        if (!old) return;
+        const parsed = JSON.parse(old);
+        const hasNew = localStorage.getItem(STORE_KEY);
+        if (hasNew) { localStorage.removeItem(OLD_STORE_KEY); return; }
+
+        const migrated = {};
+        for (const [date, rec] of Object.entries(parsed)) {
+          migrated[date] = {
+            date: rec.date,
+            percent: rec.percent || 0,
+            updatedAt: rec.updatedAt || new Date().toISOString(),
+            "task-math-count": rec.mathCount ?? 5,
+            "task-math-check-0": rec.mathReflection ?? false,
+            "task-english-count": rec.wordCount ?? 100,
+            "task-english-check-0": rec.oldWordsClear ?? false,
+            "task-major-text-0": rec.majorSubject ?? "数据结构 / 计组",
+            "task-major-text-1": rec.majorChapter ?? "",
+            "task-major-check-0": rec.majorMistakes ?? true,
+            "task-major-check-1": rec.majorCore ?? false,
+            wakeTime: rec.wakeTime ?? "07:30",
+            bedTime: rec.bedTime ?? "23:30",
+            studyHours: rec.studyHours ?? 6,
+            focusScore: rec.focusScore ?? 7,
+            phoneScore: rec.phoneScore ?? 7,
+            noMorningVideo: rec.noMorningVideo ?? false,
+            review: rec.review ?? ""
+          };
+        }
+        localStorage.setItem(STORE_KEY, JSON.stringify(migrated));
+        localStorage.removeItem(OLD_STORE_KEY);
+      } catch {}
+    }
+
+    function readStore() {
+      try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+      catch { return {}; }
+    }
+
+    function writeStore(data) {
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    }
+
+    // ── Scoring ──
+    function scoreCurrent() {
+      const tasks = getEnabledTasks();
+      let taskTotal = 0;
+      let taskMax = 0;
+
+      tasks.forEach(task => {
+        const weight = Number(task.weight) || 0;
+        taskMax += weight;
+        const checkboxes = task.checkboxes || [];
+        const hasTarget = Number(task.target) > 0;
+        const numChecks = checkboxes.length;
+
+        let portions;
+        if (hasTarget && numChecks === 0) {
+          portions = { count: 1, checks: [] };
+        } else if (hasTarget && numChecks === 1) {
+          portions = { count: 0.6, checks: [0.4] };
+        } else if (hasTarget && numChecks >= 2) {
+          portions = { count: 0.5, checks: checkboxes.map(() => 0.5 / numChecks) };
+        } else if (!hasTarget && numChecks >= 1) {
+          portions = { count: 0, checks: checkboxes.map(() => 1 / numChecks) };
+        } else {
+          portions = { count: 1, checks: [] };
+        }
+
+        let score = 0;
+        if (hasTarget && portions.count > 0) {
+          const count = Number(getFieldValue(`task-${task.id}-count`) || 0);
+          score += Math.min(count / task.target, 1) * weight * portions.count;
+        }
+        portions.checks.forEach((cp, i) => {
+          const checked = getFieldValue(`task-${task.id}-check-${i}`);
+          score += (checked ? weight * cp : 0);
+        });
+        taskTotal += score;
+      });
+
+      const studyWeight = 6;
+      const phoneWeight = 4;
+      const maxTotal = taskMax + studyWeight + phoneWeight;
+
+      const studyScore = Math.min(Number(getFieldValue("studyHours") || 0) / 6, 1) * studyWeight;
+      const phoneScore = (getFieldValue("noMorningVideo") && Number(getFieldValue("phoneScore") || 0) >= 7) ? phoneWeight : 0;
+      const total = taskTotal + studyScore + phoneScore;
+
+      return maxTotal > 0 ? Math.round((total / maxTotal) * 100) : 0;
+    }
+
+    function currentRecord() {
+      const tasks = getEnabledTasks();
+      const record = {
+        date: $("date").value,
+        percent: scoreCurrent(),
+        updatedAt: new Date().toISOString()
+      };
+
+      tasks.forEach(task => {
+        if (Number(task.target) > 0) {
+          record[`task-${task.id}-count`] = getFieldValue(`task-${task.id}-count`);
+        }
+        (task.checkboxes || []).forEach((_, i) => {
+          record[`task-${task.id}-check-${i}`] = getFieldValue(`task-${task.id}-check-${i}`);
+        });
+        (task.textFields || []).forEach((tf, i) => {
+          record[`task-${task.id}-text-${i}`] = getFieldValue(`task-${task.id}-text-${i}`);
+        });
+      });
+
+      ROUTINE_FIELDS.forEach(id => {
+        record[id] = getFieldValue(id);
+      });
+      return record;
+    }
+
+    // ── Render task cards ──
+    function captureTaskValues() {
+      const vals = {};
+      readTaskConfig().forEach(task => {
+        if (Number(task.target) > 0) vals[`task-${task.id}-count`] = getFieldValue(`task-${task.id}-count`);
+        (task.checkboxes||[]).forEach((_,i) => vals[`task-${task.id}-check-${i}`] = getFieldValue(`task-${task.id}-check-${i}`));
+        (task.textFields||[]).forEach((_,i) => vals[`task-${task.id}-text-${i}`] = getFieldValue(`task-${task.id}-text-${i}`));
+      });
+      return vals;
+    }
+
+    function restoreTaskValues(vals) {
+      Object.entries(vals).forEach(([id, val]) => { if (val !== undefined) setFieldValue(id, val); });
+    }
+
+    function safeRerender() {
+      const vals = captureTaskValues();
+      renderTaskCards();
+      restoreTaskValues(vals);
+      updateUi();
+    }
+
+    function renderTaskCards() {
+      const tasks = getEnabledTasks();
+      const grid = $("taskGrid");
+
+      if (!tasks.length) {
+        grid.innerHTML = '<div class="empty-hint" style="grid-column:1/-1">⚙️ 还没有启用任务<br><small>点击右上角齿轮按钮管理任务</small></div>';
+        return;
+      }
+
+      grid.innerHTML = tasks.map(task => {
+        const checkboxes = task.checkboxes || [];
+        const textFields = task.textFields || [];
+        const hasTarget = Number(task.target) > 0;
+        const wideClass = task.wide ? ' wide' : '';
+
+        let html = `<article class="task-card${wideClass}">`;
+        html += `<h3 class="task-heading">${task.icon} ${task.name}</h3>`;
+
+        // Text fields
+        if (textFields.length === 2) {
+          html += '<div class="two-cols">';
+          textFields.forEach((tf, i) => {
+            html += `
+              <label class="field">
+                <span class="label">${tf.label}</span>
+                <input id="task-${task.id}-text-${i}" type="text" placeholder="${tf.placeholder || ''}" value="${tf.defaultVal || ''}">
+              </label>
+            `;
+          });
+          html += '</div>';
+        } else if (textFields.length === 1) {
+          const tf = textFields[0];
+          html += `
+            <label class="field">
+              <span class="label">${tf.label}</span>
+              <input id="task-${task.id}-text-0" type="text" placeholder="${tf.placeholder || ''}" value="${tf.defaultVal || ''}">
+            </label>
+          `;
+        }
+
+        // Count field
+        if (hasTarget) {
+          html += `
+            <label class="field">
+              <span class="label">${task.name}数量，目标 ${task.target} ${task.unit}</span>
+              <input id="task-${task.id}-count" type="number" min="0" max="999" value="${task.target}">
+            </label>
+          `;
+        }
+
+        // Checkboxes
+        if (checkboxes.length === 2 && !hasTarget && textFields.length === 2) {
+          html += '<div class="two-cols">';
+          checkboxes.forEach((cb, i) => {
+            html += `
+              <label class="checkbox-row">
+                <input id="task-${task.id}-check-${i}" type="checkbox">
+                <span class="fake-check">✓</span>
+                <span><strong>${cb.label}</strong><br><span class="hint">${cb.hint}</span></span>
+              </label>
+            `;
+          });
+          html += '</div>';
+        } else {
+          checkboxes.forEach((cb, i) => {
+            html += `
+              <label class="checkbox-row">
+                <input id="task-${task.id}-check-${i}" type="checkbox">
+                <span class="fake-check">✓</span>
+                <span><strong>${cb.label}</strong><br><span class="hint">${cb.hint}</span></span>
+              </label>
+            `;
+          });
+        }
+
+        html += '</article>';
+        return html;
+      }).join("");
+    }
+
+    // ── Load / save ──
+    function loadDate(date) {
+      const data = readStore();
+      const record = data[date];
+      const allTasks = readTaskConfig();
+
+      // Reset all task fields to defaults
+      allTasks.forEach(task => {
+        if (Number(task.target) > 0) {
+          setFieldValue(`task-${task.id}-count`, task.target);
+        }
+        (task.checkboxes || []).forEach((_, i) => {
+          setFieldValue(`task-${task.id}-check-${i}`, false);
+        });
+        (task.textFields || []).forEach((tf, i) => {
+          setFieldValue(`task-${task.id}-text-${i}`, tf.defaultVal || "");
+        });
+      });
+
+      // Reset routine
+      ROUTINE_FIELDS.forEach(id => {
+        const defaults = { wakeTime:"07:30", bedTime:"23:30", studyHours:6, focusScore:7, phoneScore:7, noMorningVideo:false, review:"" };
+        setFieldValue(id, defaults[id]);
+      });
+
+      // Load saved values
+      if (record) {
+        allTasks.forEach(task => {
+          if (Number(task.target) > 0) {
+            const v = record[`task-${task.id}-count`];
+            if (v !== undefined) setFieldValue(`task-${task.id}-count`, v);
+          }
+          (task.checkboxes || []).forEach((_, i) => {
+            const v = record[`task-${task.id}-check-${i}`];
+            if (v !== undefined) setFieldValue(`task-${task.id}-check-${i}`, v);
+          });
+          (task.textFields || []).forEach((tf, i) => {
+            const v = record[`task-${task.id}-text-${i}`];
+            if (v !== undefined) setFieldValue(`task-${task.id}-text-${i}`, v);
+          });
+        });
+        ROUTINE_FIELDS.forEach(id => {
+          if (record[id] !== undefined) setFieldValue(id, record[id]);
+        });
+      }
+
+      updateUi();
+    }
+
+    function saveToday() {
+      const data = readStore();
+      const record = currentRecord();
+      data[record.date] = record;
+      writeStore(data);
+      updateUi();
+      showToast("已保存今天的记录");
+    }
+
+    function resetDay() {
+      const date = $("date").value;
+      const data = readStore();
+      delete data[date];
+      writeStore(data);
+      loadDate(date);
+      showToast("当天已重置");
+    }
+
+    function exportData() {
+      const data = readStore();
+      const payload = JSON.stringify(data, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `kaoyan-tracker-${$("date").value}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("数据已导出");
+    }
+
+    // ── UI updates ──
+    function updateDateText() {
+      const value = $("date").value;
+      const d = new Date(`${value}T00:00:00`);
+      $("dateText").textContent = `${value} ${weekNames[d.getDay()]}`;
+      $("dayPill").textContent = weekNames[d.getDay()];
+    }
+
+    function updateStats() {
+      const data = readStore();
+      const all = Object.values(data);
+      const current = currentRecord();
+      const withCurrent = { ...data, [current.date]: current };
+      const records = Object.values(withCurrent);
+      const average = records.length
+        ? Math.round(records.reduce((sum, r) => sum + Number(r.percent || 0), 0) / records.length)
+        : 0;
+      const hours = records.length
+        ? (records.reduce((sum, r) => sum + Number(r.studyHours || 0), 0) / records.length)
+        : 0;
+      const phoneWins = all.filter(r => r.noMorningVideo && Number(r.phoneScore || 0) >= 7).length;
+
+      $("todayPercent").textContent = `${current.percent}%`;
+      $("recordDays").textContent = all.length;
+      $("averagePercent").textContent = `${average}%`;
+      $("averageHours").textContent = `${hours.toFixed(1)}h`;
+      $("phoneWins").textContent = phoneWins;
+      $("progressFill").style.setProperty("--progress", `${current.percent}%`);
+    }
+
+    function updateRecords() {
+      const data = readStore();
+      const records = Object.values(data).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 7);
+      const list = $("recordList");
+      if (!records.length) {
+        list.innerHTML = '<div class="tip">还没有保存记录。先完成今天，再点"保存今天"。</div>';
+        return;
+      }
+
+      list.innerHTML = records.map(item => {
+        const d = new Date(`${item.date}T00:00:00`);
+        const tasks = getEnabledTasks();
+        const firstCount = tasks.length ? (item[`task-${tasks[0].id}-count`] || 0) : 0;
+        const firstLabel = tasks.length ? tasks[0].name : "";
+        const hours = Number(item.studyHours || 0);
+        return `
+          <article class="record">
+            <div class="record-top">
+              <span>${item.date} ${weekNames[d.getDay()]}</span>
+              <span>${item.percent || 0}%</span>
+            </div>
+            <div class="mini-progress"><span style="--mini:${item.percent || 0}%"></span></div>
+            <div class="hint">${hours}h · ${firstLabel} ${firstCount}</div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function updateUi() {
+      updateDateText();
+      updateStats();
+      updateRecords();
+    }
+
+    function showToast(message) {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    // ── Task Manager Modal ──
+    let editingTaskId = null;
+
+    function openModal() {
+      editingTaskId = null;
+      renderModal();
+      $("taskModal").classList.add("open");
+    }
+
+    function closeModal() {
+      $("taskModal").classList.remove("open");
+      editingTaskId = null;
+    }
+
+    function renderModal() {
+      const config = readTaskConfig();
+      const listContainer = $("taskListContainer");
+      const formContainer = $("taskFormContainer");
+
+      // Task list
+      listContainer.innerHTML = config.map(task => {
+        const checkboxes = task.checkboxes || [];
+        const hasTarget = Number(task.target) > 0;
+        const parts = [];
+        if (hasTarget) parts.push(`目标 ${task.target}${task.unit}`);
+        if (checkboxes.length) parts.push(`${checkboxes.length} 复选框`);
+        const meta = parts.join(" · ") || "无指标";
+        const lockIcon = task.locked ? ' 🔒' : '';
+
+        return `
+          <div class="task-list-item">
+            <label class="toggle-switch" onclick="event.stopPropagation()">
+              <input type="checkbox" ${task.enabled ? 'checked' : ''} onchange="toggleTask('${task.id}', this.checked)">
+              <span class="toggle-track"></span>
+            </label>
+            <span style="font-size:20px">${task.icon}</span>
+            <span class="task-name">${task.name}${lockIcon}</span>
+            <span class="task-meta">${meta}</span>
+            <span class="badge">${task.weight}分</span>
+            <button onclick="editTask('${task.id}')" title="编辑">✎</button>
+            ${task.locked ? '' : `<button class="del" onclick="deleteTask('${task.id}')" title="删除">✕</button>`}
+            ${task.locked ? '<button disabled style="opacity:.3" title="内置任务不可删除">✕</button>' : ''}
+          </div>
+        `;
+      }).join("");
+
+      // Add button
+      listContainer.innerHTML += `
+        <button class="btn primary" style="width:100%;margin-top:12px" onclick="showAddForm()">
+          ＋ 添加自定义任务
+        </button>
+      `;
+
+      // Form
+      if (editingTaskId !== null) {
+        const task = editingTaskId === "__new__"
+          ? { id:"", name:"", icon:"📝", target:0, unit:"", checkboxes:[], textFields:[], weight:15, enabled:true, locked:false, wide:false }
+          : config.find(t => t.id === editingTaskId);
+        if (!task) { editingTaskId = null; renderModal(); return; }
+
+        const isNew = editingTaskId === "__new__";
+        const isLocked = task.locked && !isNew;
+        const emojis = EMOJI_LIST.map(e => `
+          <button class="${task.icon === e ? 'selected' : ''}" onclick="selectEmoji('${e}')">${e}</button>
+        `).join("");
+
+        formContainer.innerHTML = `
+          <div class="form-section">
+            <h3>${isNew ? '新建任务' : '编辑 ' + task.name}</h3>
+            <div class="form-grid">
+              <label>名称${isLocked ? ' 🔒' : ''}
+                <input id="formName" value="${task.name}" ${isLocked ? 'readonly' : ''}>
+              </label>
+              <label>图标
+                <div class="emoji-picker" id="emojiPicker">${emojis}</div>
+              </label>
+              <label>目标数量 (0 = 无)
+                <input id="formTarget" type="number" min="0" max="999" value="${task.target}" ${isLocked ? 'readonly' : ''}>
+              </label>
+              <label>单位
+                <input id="formUnit" value="${task.unit || ''}" placeholder="道 / 个 / 章" ${isLocked ? 'readonly' : ''}>
+              </label>
+              <label class="full">复选框1 标签 ${isLocked ? '🔒' : ''}
+                <input id="formCheckLabel" value="${(task.checkboxes[0] || {}).label || ''}" placeholder="留空 = 无复选框" ${isLocked ? 'readonly' : ''}>
+              </label>
+              <label class="full">复选框1 提示
+                <input id="formCheckHint" value="${(task.checkboxes[0] || {}).hint || ''}" ${isLocked ? 'readonly' : ''}>
+              </label>
+              <label>权重 (1-50)
+                <input id="formWeight" type="number" min="1" max="50" value="${task.weight}">
+              </label>
+              <label>宽卡片
+                <select id="formWide">
+                  <option value="0" ${!task.wide ? 'selected' : ''}>否</option>
+                  <option value="1" ${task.wide ? 'selected' : ''}>是</option>
+                </select>
+              </label>
+            </div>
+            <div class="actions">
+              <button class="btn primary" onclick="saveTask('${editingTaskId}')">保存</button>
+              <button class="btn" onclick="cancelEdit()">取消</button>
+            </div>
+          </div>
+        `;
+      } else {
+        formContainer.innerHTML = "";
+      }
+    }
+
+    window.selectEmoji = function(emoji) {
+      const buttons = document.querySelectorAll("#emojiPicker button");
+      buttons.forEach(b => b.classList.toggle("selected", b.textContent === emoji));
+    };
+
+    window.showAddForm = function() {
+      editingTaskId = "__new__";
+      renderModal();
+    };
+
+    window.editTask = function(id) {
+      editingTaskId = id;
+      renderModal();
+    };
+
+    window.cancelEdit = function() {
+      editingTaskId = null;
+      renderModal();
+    };
+
+    window.saveTask = function(editingId) {
+      const config = readTaskConfig();
+      const isNew = editingId === "__new__";
+      const name = ($("formName").value || "").trim();
+      if (!name) { showToast("请输入任务名称"); return; }
+
+      const target = parseInt($("formTarget").value) || 0;
+      const checkLabel = ($("formCheckLabel").value || "").trim();
+      const checkHint = ($("formCheckHint").value || "").trim();
+      const weight = Math.max(1, Math.min(50, parseInt($("formWeight").value) || 15));
+      const wide = $("formWide").value === "1";
+      const selectedEmoji = document.querySelector("#emojiPicker button.selected");
+      const icon = selectedEmoji ? selectedEmoji.textContent : "📝";
+
+      const taskData = {
+        name, icon, target,
+        unit: ($("formUnit").value || "").trim(),
+        checkboxes: checkLabel ? [{ label: checkLabel, hint: checkHint }] : [],
+        textFields: [],
+        weight, wide,
+        enabled: true,
+        locked: isNew ? false : (config.find(t => t.id === editingId) || {}).locked || false
+      };
+
+      if (isNew) {
+        const id = "custom-" + Date.now();
+        config.push({ id, ...taskData });
+      } else {
+        const idx = config.findIndex(t => t.id === editingId);
+        if (idx >= 0) {
+          const existing = config[idx];
+          config[idx] = { ...existing, ...taskData, id: existing.id, locked: existing.locked, textFields: existing.textFields, checkboxes: existing.locked ? existing.checkboxes : taskData.checkboxes };
+        }
+      }
+
+      writeTaskConfig(config);
+      editingTaskId = null;
+      safeRerender();
+      renderModal();
+      showToast(isNew ? "任务已添加" : "任务已更新");
+    };
+
+    window.toggleTask = function(id, enabled) {
+      const config = readTaskConfig();
+      const task = config.find(t => t.id === id);
+      if (task) {
+        task.enabled = enabled;
+        writeTaskConfig(config);
+        safeRerender();
+      }
+    };
+
+    window.deleteTask = function(id) {
+      const config = readTaskConfig();
+      const task = config.find(t => t.id === id);
+      if (!task || task.locked) return;
+      if (!confirm(`确定删除任务"${task.name}"？相关历史数据将保留但不再显示。`)) return;
+
+      const idx = config.findIndex(t => t.id === id);
+      if (idx >= 0) {
+        config.splice(idx, 1);
+        writeTaskConfig(config);
+        safeRerender();
+        renderModal();
+        showToast(`已删除 ${task.name}`);
+      }
+    };
+
+    // ── Init ──
+    migrateData();
+
+    // Ensure task config exists
+    if (!localStorage.getItem(CONFIG_KEY)) {
+      writeTaskConfig(JSON.parse(JSON.stringify(DEFAULT_TASKS)));
+    }
+
+    $("date").value = todayIso();
+    renderTaskCards();
+    loadDate($("date").value);
+
+    $("date").addEventListener("change", e => {
+      renderTaskCards();
+      loadDate(e.target.value);
+    });
+    $("saveBtn").addEventListener("click", saveToday);
+    $("resetBtn").addEventListener("click", resetDay);
+    $("exportBtn").addEventListener("click", exportData);
+    $("manageTasksBtn").addEventListener("click", openModal);
+    $("modalCloseBtn").addEventListener("click", closeModal);
+    $("taskModal").addEventListener("click", e => { if (e.target === $("taskModal")) closeModal(); });
+
+    document.addEventListener("input", e => {
+      if (e.target.matches("input, textarea")) updateUi();
+    });
+    document.addEventListener("change", e => {
+      if (e.target.matches("input, textarea")) updateUi();
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeModal();
+    });
+  </script>
+</body>
+</html>
